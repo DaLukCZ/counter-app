@@ -17,6 +17,7 @@
       <div>
         <p>Počet záznamů: {{ counterService.counters().length }}</p>
         <p class="history-total">Součet hodnot: {{ total() }}</p>
+        <p class="history-average">Průměrná hodnota: {{ average() }}</p>
       </div>
       <ion-button color="danger" fill="outline" size="small" (click)="clear()">
         Vymazat vše

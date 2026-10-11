@@ -56,6 +56,11 @@ export class Tab2Page implements OnInit {
       .reduce((sum, counter) => sum + counter.value, 0),
   );
 
+  readonly average = computed(() => {
+    const counters = this.counterService.counters();
+    return counters.length === 0 ? 0 : counters.reduce((sum, counter) => sum + counter.value, 0) / counters.length;
+  });
+
   readonly visibleCounters = computed(() => {
     const term = this.searchTerm().trim().toLocaleLowerCase('cs');
     const filtered = this.counterService
