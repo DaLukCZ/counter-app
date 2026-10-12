@@ -1,6 +1,5 @@
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { AlertController, ToastController } from '@ionic/angular';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { SavedCounter } from '../models/saved-counter';
 import { CounterService } from '../services/counter.service';
@@ -32,28 +31,15 @@ describe('Tab2Page', () => {
     clear: vi.fn(),
   };
 
-  const alertMock = { present: vi.fn(), onDidDismiss: vi.fn() };
-  const alertControllerMock = { create: vi.fn() };
-  const toastMock = { present: vi.fn() };
-  const toastControllerMock = { create: vi.fn() };
-
   beforeEach(() => {
     vi.clearAllMocks();
     counterServiceMock.counters.set([visitors, cars]);
     counterServiceMock.initialize.mockResolvedValue(undefined);
     counterServiceMock.remove.mockResolvedValue(undefined);
     counterServiceMock.clear.mockResolvedValue(undefined);
-    alertMock.present.mockResolvedValue(undefined);
-    alertControllerMock.create.mockResolvedValue(alertMock);
-    toastMock.present.mockResolvedValue(undefined);
-    toastControllerMock.create.mockResolvedValue(toastMock);
 
     TestBed.configureTestingModule({
-      providers: [
-        { provide: CounterService, useValue: counterServiceMock },
-        { provide: AlertController, useValue: alertControllerMock },
-        { provide: ToastController, useValue: toastControllerMock },
-      ],
+      providers: [{ provide: CounterService, useValue: counterServiceMock }],
     });
 
     fixture = TestBed.createComponent(Tab2Page);
@@ -91,19 +77,21 @@ describe('Tab2Page', () => {
   });
 
   it('should clear the history only after confirmation', async () => {
-    alertMock.onDidDismiss.mockResolvedValue({ role: 'cancel' });
-    await component.clear();
+    await component.onClearAlertDismiss('cancel');
     expect(counterServiceMock.clear).not.toHaveBeenCalled();
+    expect(component.toastOpen()).toBe(false);
 
-    alertMock.onDidDismiss.mockResolvedValue({ role: 'destructive' });
-    await component.clear();
+    await component.onClearAlertDismiss('destructive');
     expect(counterServiceMock.clear).toHaveBeenCalledTimes(1);
+    expect(component.toastOpen()).toBe(true);
+    expect(component.toastMessage()).toBe('Historie byla vymazána.');
   });
 
   it('should show a toast after removing a counter', async () => {
     await component.remove('cars');
 
     expect(counterServiceMock.remove).toHaveBeenCalledWith('cars');
-    expect(toastMock.present).toHaveBeenCalledTimes(1);
+    expect(component.toastOpen()).toBe(true);
+    expect(component.toastMessage()).toBe('Záznam byl odstraněn.');
   });
 });

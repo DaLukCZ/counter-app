@@ -19,9 +19,16 @@
         <p class="history-total">Součet hodnot: {{ total() }}</p>
         <p class="history-average">Průměrná hodnota: {{ average() }}</p>
       </div>
-      <ion-button color="danger" fill="outline" size="small" (click)="clear()">
+      <ion-button id="clear-history" color="danger" fill="outline" size="small">
         Vymazat vše
       </ion-button>
+      <ion-alert
+        trigger="clear-history"
+        header="Vymazat historii?"
+        message="Všechny uložené záznamy budou trvale odstraněny."
+        [buttons]="clearAlertButtons"
+        (didDismiss)="onClearAlertDismiss($event.detail.role)"
+      ></ion-alert>
     </div>
 
     <div class="history-controls">
@@ -74,4 +81,12 @@
       </ion-list>
     }
   }
+
+  <ion-toast
+    [isOpen]="toastOpen()"
+    [message]="toastMessage()"
+    [duration]="2000"
+    position="bottom"
+    (didDismiss)="toastOpen.set(false)"
+  ></ion-toast>
 </ion-content>

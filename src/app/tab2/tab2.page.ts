@@ -1,7 +1,7 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import {
-  AlertController,
+  IonAlert,
   IonButton,
   IonContent,
   IonHeader,
@@ -14,8 +14,8 @@ import {
   IonSegmentButton,
   IonSpinner,
   IonTitle,
+  IonToast,
   IonToolbar,
-  ToastController,
 } from '@ionic/angular';
 import { CounterService } from '../services/counter.service';
 
@@ -27,6 +27,7 @@ export type HistorySort = 'newest' | 'name' | 'value';
   styleUrls: ['tab2.page.scss'],
   imports: [
     DatePipe,
+    IonAlert,
     IonButton,
     IonContent,
     IonHeader,
@@ -39,16 +40,22 @@ export type HistorySort = 'newest' | 'name' | 'value';
     IonSegmentButton,
     IonSpinner,
     IonTitle,
+    IonToast,
     IonToolbar,
   ],
 })
 export class Tab2Page implements OnInit {
   readonly counterService = inject(CounterService);
-  private readonly alertController = inject(AlertController);
-  private readonly toastController = inject(ToastController);
 
   readonly searchTerm = signal('');
   readonly sortBy = signal<HistorySort>('newest');
+  readonly toastOpen = signal(false);
+  readonly toastMessage = signal('');
+
+  readonly clearAlertButtons = [
+    { text: 'Zrušit', role: 'cancel' },
+    { text: 'Vymazat', role: 'destructive' },
+  ];
 
   readonly total = computed(() =>
     this.counterService
@@ -95,35 +102,18 @@ export class Tab2Page implements OnInit {
 
   async remove(id: string): Promise<void> {
     await this.counterService.remove(id);
-    await this.showToast('Záznam byl odstraněn.');
+    this.showToast('Záznam byl odstraněn.');
   }
 
-  async clear(): Promise<void> {
-    const alert = await this.alertController.create({
-      header: 'Vymazat historii?',
-      message: 'Všechny uložené záznamy budou trvale odstraněny.',
-      buttons: [
-        { text: 'Zrušit', role: 'cancel' },
-        { text: 'Vymazat', role: 'destructive' },
-      ],
-    });
-
-    await alert.present();
-    const { role } = await alert.onDidDismiss();
-
+  async onClearAlertDismiss(role: string | undefined): Promise<void> {
     if (role === 'destructive') {
       await this.counterService.clear();
-      await this.showToast('Historie byla vymazána.');
+      this.showToast('Historie byla vymazána.');
     }
   }
 
-  private async showToast(message: string): Promise<void> {
-    const toast = await this.toastController.create({
-      message,
-      duration: 2000,
-      position: 'bottom',
-    });
-
-    await toast.present();
+  private showToast(message: string): void {
+    this.toastMessage.set(message);
+    this.toastOpen.set(true);
   }
 }

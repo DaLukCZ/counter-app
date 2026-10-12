@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ToastController } from '@ionic/angular';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { SavedCounter } from '../models/saved-counter';
 import { CounterService } from '../services/counter.service';
@@ -13,20 +12,12 @@ describe('Tab1Page', () => {
     add: vi.fn(),
   };
 
-  const toastMock = { present: vi.fn() };
-  const toastControllerMock = { create: vi.fn() };
-
   beforeEach(() => {
     vi.clearAllMocks();
     counterServiceMock.add.mockResolvedValue(undefined);
-    toastMock.present.mockResolvedValue(undefined);
-    toastControllerMock.create.mockResolvedValue(toastMock);
 
     TestBed.configureTestingModule({
-      providers: [
-        { provide: CounterService, useValue: counterServiceMock },
-        { provide: ToastController, useValue: toastControllerMock },
-      ],
+      providers: [{ provide: CounterService, useValue: counterServiceMock }],
     });
 
     fixture = TestBed.createComponent(Tab1Page);
@@ -49,6 +40,7 @@ describe('Tab1Page', () => {
     await component.onSaved(counter);
 
     expect(counterServiceMock.add).toHaveBeenCalledWith(counter);
-    expect(toastMock.present).toHaveBeenCalledTimes(1);
+    expect(component.toastOpen()).toBe(true);
+    expect(component.toastMessage()).toContain('První');
   });
 });
