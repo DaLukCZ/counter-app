@@ -31,8 +31,11 @@ export class Tab1Page {
 
   async onSaved(counter: SavedCounter): Promise<void> {
     await this.counterService.add(counter);
+    this.showToast(`Počítadlo „${counter.name}“ bylo uloženo.`);
+  }
 
-    this.toastMessage.set(`Počítadlo „${counter.name}“ bylo uloženo.`);
+  private showToast(message: string): void {
+    this.toastMessage.set(message);
     this.toastOpen.set(true);
   }
 }
