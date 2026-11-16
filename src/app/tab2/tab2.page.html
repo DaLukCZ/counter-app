@@ -5,6 +5,14 @@
 </ion-header>
 
 <ion-content [fullscreen]="true" class="ion-padding">
+  @if (counterService.errorMessage()) {
+    <p class="state-message">{{ counterService.errorMessage() }}</p>
+  }
+
+  @if (auth.userId(); as uid) {
+    <p class="state-message">Anonymní uživatel: {{ uid }}</p>
+  }
+
   @if (!counterService.initialized()) {
     <div class="state-message">
       <ion-spinner></ion-spinner>
@@ -19,16 +27,6 @@
         <p class="history-total">Součet hodnot: {{ total() }}</p>
         <p class="history-average">Průměrná hodnota: {{ average() }}</p>
       </div>
-      <ion-button id="clear-history" color="danger" fill="outline" size="small">
-        Vymazat vše
-      </ion-button>
-      <ion-alert
-        trigger="clear-history"
-        header="Vymazat historii?"
-        message="Všechny uložené záznamy budou trvale odstraněny."
-        [buttons]="clearAlertButtons"
-        (didDismiss)="onClearAlertDismiss($event.detail.role)"
-      ></ion-alert>
     </div>
 
     <div class="history-controls">

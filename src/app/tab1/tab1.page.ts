@@ -8,7 +8,7 @@ import {
 } from '@ionic/angular';
 import { CounterComponent } from '../components/counter/counter.component';
 import { SavedCounter } from '../models/saved-counter';
-import { CounterService } from '../services/counter.service';
+import { FirebaseCounterService } from '../services/firebase-counter.service';
 
 //test comment
 
@@ -26,7 +26,7 @@ import { CounterService } from '../services/counter.service';
   ],
 })
 export class Tab1Page {
-  private readonly counterService = inject(CounterService);
+  private readonly counterService = inject(FirebaseCounterService);
 
   readonly toastOpen = signal(false);
   readonly toastMessage = signal('');
