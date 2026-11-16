@@ -10,6 +10,8 @@ import { CounterComponent } from '../components/counter/counter.component';
 import { SavedCounter } from '../models/saved-counter';
 import { CounterService } from '../services/counter.service';
 
+//test comment
+
 @Component({
   selector: 'app-tab1',
   templateUrl: 'tab1.page.html',
