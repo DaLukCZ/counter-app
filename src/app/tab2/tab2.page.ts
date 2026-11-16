@@ -1,7 +1,6 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import {
-  IonAlert,
   IonButton,
   IonContent,
   IonHeader,
@@ -17,8 +16,8 @@ import {
   IonToast,
   IonToolbar,
 } from '@ionic/angular';
-import { CounterService } from '../services/counter.service';
 import { FirebaseAuthService } from '../services/firebase-auth.service';
+import { FirebaseCounterService } from '../services/firebase-counter.service';
 
 export type HistorySort = 'newest' | 'name' | 'value';
 
@@ -28,7 +27,6 @@ export type HistorySort = 'newest' | 'name' | 'value';
   styleUrls: ['tab2.page.scss'],
   imports: [
     DatePipe,
-    IonAlert,
     IonButton,
     IonContent,
     IonHeader,
@@ -46,19 +44,13 @@ export type HistorySort = 'newest' | 'name' | 'value';
   ],
 })
 export class Tab2Page implements OnInit {
-  readonly counterService = inject(CounterService);
+  readonly counterService = inject(FirebaseCounterService);
   readonly auth = inject(FirebaseAuthService);
-  readonly authError = signal('');
 
   readonly searchTerm = signal('');
   readonly sortBy = signal<HistorySort>('newest');
   readonly toastOpen = signal(false);
   readonly toastMessage = signal('');
-
-  readonly clearAlertButtons = [
-    { text: 'Zrušit', role: 'cancel' },
-    { text: 'Vymazat', role: 'destructive' },
-  ];
 
   readonly total = computed(() =>
     this.counterService
@@ -91,13 +83,6 @@ export class Tab2Page implements OnInit {
 
   async ngOnInit(): Promise<void> {
     await this.counterService.initialize();
-
-    try {
-      await this.auth.initialize();
-    } catch (error) {
-      console.error(error);
-      this.authError.set('Přihlášení se nezdařilo. Zkontrolujte konfiguraci.');
-    }
   }
 
   onSearch(value: string | null | undefined): void {
@@ -113,13 +98,6 @@ export class Tab2Page implements OnInit {
   async remove(id: string): Promise<void> {
     await this.counterService.remove(id);
     this.showToast('Záznam byl odstraněn.');
-  }
-
-  async onClearAlertDismiss(role: string | undefined): Promise<void> {
-    if (role === 'destructive') {
-      await this.counterService.clear();
-      this.showToast('Historie byla vymazána.');
-    }
   }
 
   private showToast(message: string): void {

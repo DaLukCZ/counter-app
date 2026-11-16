@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { SavedCounter } from '../models/saved-counter';
-import { CounterService } from '../services/counter.service';
+import { FirebaseCounterService } from '../services/firebase-counter.service';
 import { Tab1Page } from './tab1.page';
 
 describe('Tab1Page', () => {
@@ -17,7 +17,9 @@ describe('Tab1Page', () => {
     counterServiceMock.add.mockResolvedValue(undefined);
 
     TestBed.configureTestingModule({
-      providers: [{ provide: CounterService, useValue: counterServiceMock }],
+      providers: [
+        { provide: FirebaseCounterService, useValue: counterServiceMock },
+      ],
     });
 
     fixture = TestBed.createComponent(Tab1Page);

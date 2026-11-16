@@ -2,7 +2,8 @@ import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { SavedCounter } from '../models/saved-counter';
-import { CounterService } from '../services/counter.service';
+import { FirebaseAuthService } from '../services/firebase-auth.service';
+import { FirebaseCounterService } from '../services/firebase-counter.service';
 import { Tab2Page } from './tab2.page';
 
 describe('Tab2Page', () => {
@@ -26,9 +27,13 @@ describe('Tab2Page', () => {
   const counterServiceMock = {
     counters: signal<SavedCounter[]>([]),
     initialized: signal(true),
+    errorMessage: signal(''),
     initialize: vi.fn(),
     remove: vi.fn(),
-    clear: vi.fn(),
+  };
+
+  const authServiceMock = {
+    userId: signal<string | null>('test-uid'),
   };
 
   beforeEach(() => {
@@ -36,10 +41,12 @@ describe('Tab2Page', () => {
     counterServiceMock.counters.set([visitors, cars]);
     counterServiceMock.initialize.mockResolvedValue(undefined);
     counterServiceMock.remove.mockResolvedValue(undefined);
-    counterServiceMock.clear.mockResolvedValue(undefined);
 
     TestBed.configureTestingModule({
-      providers: [{ provide: CounterService, useValue: counterServiceMock }],
+      providers: [
+        { provide: FirebaseCounterService, useValue: counterServiceMock },
+        { provide: FirebaseAuthService, useValue: authServiceMock },
+      ],
     });
 
     fixture = TestBed.createComponent(Tab2Page);
@@ -74,17 +81,6 @@ describe('Tab2Page', () => {
 
     component.onSortChange('newest');
     expect(component.visibleCounters()).toEqual([visitors, cars]);
-  });
-
-  it('should clear the history only after confirmation', async () => {
-    await component.onClearAlertDismiss('cancel');
-    expect(counterServiceMock.clear).not.toHaveBeenCalled();
-    expect(component.toastOpen()).toBe(false);
-
-    await component.onClearAlertDismiss('destructive');
-    expect(counterServiceMock.clear).toHaveBeenCalledTimes(1);
-    expect(component.toastOpen()).toBe(true);
-    expect(component.toastMessage()).toBe('Historie byla vymazána.');
   });
 
   it('should show a toast after removing a counter', async () => {
